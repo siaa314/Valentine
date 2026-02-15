@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>My Valentine 💘</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+
+<style>
+body{margin:0;background:#000;font-family:monospace;color:white;overflow:hidden;}
+.pinkTheme{background:#ffd6e7;color:#cc0033;}
+.pixel-bg{background-image: radial-gradient(#ff007f 2px, transparent 2px);background-size:40px 40px;}
+.screen{display:none;height:100vh;justify-content:center;align-items:center;flex-direction:column;text-align:center;position:relative;}
+.active{display:flex;}
+h1{font-size:70px;margin:0;} 
+h2{font-size:48px;}
+
+button{
+padding:20px 40px;font-size:26px;border:3px solid #cc0033;
+background:white;color:#cc0033;cursor:pointer;margin:20px;font-weight:bold;
+}
+.note{margin-top:10px;font-size:18px;}
+#noBtn{position:absolute;}
+
+/* PHOTOS */
+.photo{
+    position:absolute;
+    width:140px;
+    border-radius:10px;
+    animation:fall 1.2s ease-out forwards;
+}
+@keyframes fall{
+    from{transform:translateY(-300px);opacity:0;}
+    to{transform:translateY(0);opacity:1;}
+}
+
+/* Rapid */
+.choiceBox{display:flex;gap:60px;}
+.choice{padding:30px 50px;border:4px solid #00ffff;font-size:28px;cursor:pointer;background:black;color:#ff66a3;font-weight:bold;}
+#timer,#msg{margin-top:15px;font-size:22px}
+
+/* Wordle */
+.wordleBg{background:#e8f3e8;color:black;}
+#wordleGrid{display:grid;grid-template-rows:repeat(6,70px);gap:8px;margin-top:20px}
+
+/* Envelope */
+.envelope-container{position:relative;cursor:pointer;}
+.envelope{width:300px;height:200px;background:#ff4d6d;border-radius:10px;position:relative;overflow:hidden;}
+.flap{position:absolute;top:0;left:0;border-left:150px solid transparent;border-right:150px solid transparent;border-top:110px solid #ff758f;transform-origin:top;transition:transform 0.6s ease 0.5s;}
+.pocket{position:absolute;bottom:0;border-left:150px solid transparent;border-right:150px solid transparent;border-bottom:200px solid #ff4d6d;}
+.letter-preview{width:260px;height:180px;background:white;position:absolute;bottom:0;left:20px;border-radius:5px;transition:transform 0.8s ease 1s;}
+.seal{width:40px;height:40px;background:#d00000;border-radius:50%;position:absolute;top:80px;left:130px;}
+.envelope-container.open .flap{transform:rotateX(180deg);}
+.envelope-container.open .letter-preview{transform:translateY(-100px);}
+
+#letter-view{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:none;justify-content:center;align-items:center;}
+#letter-view.active{display:flex;}
+.love-letter{background:white;width:90%;max-width:600px;padding:3rem;border-radius:8px;font-family:'Dancing Script',cursive;font-size:1.6rem;color:#333;}
+.close-btn{position:absolute;top:10px;right:15px;font-size:1.5rem;background:none;border:none;cursor:pointer;}
+</style>
+</head>
+
+<body>
+
+<!-- START -->
+<div class="screen active pinkTheme" id="start">
+<h1>Will you be my Valentine?</h1>
+<button onclick="nextScreen('photos')">YES</button>
+<button id="noBtn">NO</button>
+<div class="note">PS: no is a little shy 🤭</div>
+</div>
+
+<!-- PHOTOS -->
+<div class="screen pinkTheme" id="photos">
+<h2>Some cute little memories…</h2>
+<button id="photoNext" style="display:none" onclick="afterPhotos()">Next</button>
+</div>
+
+<!-- HOLD -->
+<div class="screen pinkTheme" id="holdOn">
+<h2>Not so fast 😏</h2>
+<p>Let’s see how well you know me.</p>
+<button onclick="nextScreen('rapid')">Start</button>
+</div>
+
+<!-- RAPID -->
+<div class="screen pixel-bg" id="rapid">
+<h2 id="question"></h2>
+<div class="choiceBox">
+<div class="choice" id="opt1" onclick="checkAns(1)"></div>
+<div class="choice" id="opt2" onclick="checkAns(2)"></div>
+</div>
+<div id="timer"></div>
+<div id="msg"></div>
+</div>
+
+<!-- PRE WORDLE -->
+<div class="screen pinkTheme" id="preWordle">
+<h2>This is the last challenge 😌</h2>
+<button onclick="nextScreen('wordle')">Next</button>
+</div>
+
+<!-- WORDLE -->
+<div class="screen wordleBg" id="wordle">
+<h2>Guess the secret word 💗</h2>
+<p>Wordle edition</p>
+<div id="wordleGrid"></div>
+<input id="guessInput" maxlength="5" style="margin-top:20px;font-size:26px;text-transform:uppercase;text-align:center;">
+<button onclick="submitGuess()">Enter</button>
+<div id="wordleMsg"></div>
+</div>
+
+<!-- SOULMATE -->
+<div class="screen pinkTheme" id="soulmate">
+<h1>Yay, I guess we are soulmates 💘</h1>
+<button onclick="nextScreen('worthy')">Next</button>
+</div>
+
+<!-- WORTHY -->
+<div class="screen pinkTheme" id="worthy">
+<h1>You passed 😌💘</h1>
+<button onclick="nextScreen('envelopeScreen')">Open your letter</button>
+</div>
+
+<!-- ENVELOPE -->
+<div class="screen pinkTheme" id="envelopeScreen">
+<div class="envelope-container" id="envelope" onclick="openEnvelope()">
+<div class="envelope">
+<div class="pocket"></div>
+<div class="letter-preview"></div>
+<div class="flap"></div>
+<div class="seal">❤️</div>
+</div>
+</div>
+</div>
+
+<!-- LETTER VIEW -->
+<div id="letter-view">
+<div class="love-letter">
+<button class="close-btn" onclick="closeLetter()">×</button>
+<h2>Hi Aditya,</h2>
+<p>I know I don’t say it enough, but I really do appreciate everything that you do for me, and I’m so grateful to have you in my life.
+    I’m soo proud of you for working so hard and always improving. I want you to achieve everything in life that you want. It makes me so happy to see you do well for yourself. I just hope that we get to experience everything and grow old together.
+    You’re the best thing that has happened to me.
+    I love you, my forever valentine ❤️</p>
+<p style="text-align:right;">— Si <3</p>
+</div>
+</div>
+
+<script>
+let screens=document.querySelectorAll('.screen');
+function nextScreen(id){
+screens.forEach(s=>s.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+if(id==='photos') dropPhotos();
+if(id==='rapid') startRapid();
+if(id==='wordle') initWordle();
+}
+
+noBtn.onmouseover=function(){
+noBtn.style.top=Math.random()*80+'%';
+noBtn.style.left=Math.random()*80+'%';
+};
+
+/* PHOTO BORDER DROP */
+function dropPhotos(){
+const positions=[
+/* TOP 5 */
+{top:"6%",left:"12%"},
+{top:"6%",left:"28%"},
+{top:"6%",left:"44%"},
+{top:"6%",left:"60%"},
+{top:"6%",left:"76%"},
+
+/* LEFT 1 */
+{top:"46%",left:"4%"},
+
+/* RIGHT 1 */
+{top:"46%",left:"88%"},
+
+/* BOTTOM 6 */
+{top:"72%",left:"10%"},
+{top:"72%",left:"24%"},
+{top:"72%",left:"38%"},
+{top:"72%",left:"52%"},
+{top:"72%",left:"66%"},
+{top:"72%",left:"80%"}
+];
+
+positions.forEach((pos,i)=>{
+setTimeout(()=>{
+let img=document.createElement('img');
+img.src=`photo${i+1}.jpg`;
+img.className='photo';
+img.style.top=pos.top;
+img.style.left=pos.left;
+document.body.appendChild(img);
+},i*180);
+});
+
+setTimeout(()=>photoNext.style.display="block",positions.length*180+800);
+}
+
+function afterPhotos(){
+document.querySelectorAll('.photo').forEach(p=>p.remove());
+nextScreen('holdOn');
+}
+
+/* RAPID */
+let questions=[
+{q:"My fav colour?",a1:"Pink",a2:"Brown",correct:1},
+{q:"Which would I prefer?",a1:"Peonies",a2:"Lillies",correct:1},
+{q:"Choose one?",a1:"Gin",a2:"Tequila",correct:2},
+{q:"My pick?",a1:"Date night in",a2:"Date night out",correct:1},
+{q:"😀?",a1:"Mega Knight",a2:"Rune Giant",correct:2}
+];
+let current=0,time=15,timerInt;
+function startRapid(){current=0;showQ();}
+function showQ(){
+if(current>=questions.length){nextScreen('preWordle');return;}
+let q=questions[current];
+question.innerText=q.q;
+opt1.innerText=q.a1;
+opt2.innerText=q.a2;
+time=15;
+timer.innerText="Time left: "+time+"s";
+timerInt=setInterval(()=>{time--;timer.innerText="Time left: "+time+"s";if(time<=0)restartRapid();},1000);
+}
+function checkAns(c){
+clearInterval(timerInt);
+if(c===questions[current].correct){current++;showQ();}
+else restartRapid();
+}
+function restartRapid(){msg.innerText="Oops 😏 Try again!";setTimeout(startRapid,1200);}
+
+/* WORDLE */
+const word="PEONY";let attempts=0,currentRow=0;
+function initWordle(){
+attempts=0;currentRow=0;wordleGrid.innerHTML="";wordleMsg.innerText="";
+for(let i=0;i<6;i++){
+let row=document.createElement('div');
+row.style.display="grid";
+row.style.gridTemplateColumns="repeat(5,70px)";
+row.style.gap="8px";
+for(let j=0;j<5;j++){
+let tile=document.createElement('div');
+tile.style.border="2px solid #ccc";
+tile.style.height="60px";
+tile.style.display="flex";
+tile.style.alignItems="center";
+tile.style.justifyContent="center";
+tile.style.fontSize="28px";
+tile.style.background="white";
+row.appendChild(tile);
+}
+wordleGrid.appendChild(row);
+}
+}
+function submitGuess(){
+let guess=guessInput.value.toUpperCase();
+if(guess.length!==5)return;
+let row=wordleGrid.children[currentRow];
+let tiles=row.children;
+for(let i=0;i<5;i++){
+tiles[i].innerText=guess[i];
+if(guess[i]===word[i])tiles[i].style.background="#6aaa64";
+else if(word.includes(guess[i]))tiles[i].style.background="#c9b458";
+else tiles[i].style.background="#787c7e";
+tiles[i].style.color="white";
+}
+guessInput.value="";
+attempts++;currentRow++;
+if(guess===word)setTimeout(()=>nextScreen('soulmate'),1200);
+else if(attempts>=6){wordleMsg.innerText="Try again 😌";setTimeout(initWordle,1500);}
+}
+
+/* ENVELOPE */
+function openEnvelope(){
+document.getElementById('envelope').classList.add('open');
+setTimeout(()=>document.getElementById('letter-view').classList.add('active'),1500);
+}
+function closeLetter(){
+document.getElementById('letter-view').classList.remove('active');
+}
+</script>
+
+</body>
+</html>
